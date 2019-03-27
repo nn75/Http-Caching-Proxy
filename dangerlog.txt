@@ -1,0 +1,39 @@
+Danger log for HTTP Caching Proxy
+
+
+1. Multi-thread danger:
+
+    1) We use linked list data structure for our cache. To deal with race condition, we 
+    add mutex lock to ensure thread-safe. When add, update and remove block from the
+    cache list, only one thread can manipulate the linked link at one time. The search operation does not need to 
+    be protected by mutex.
+
+    2) We use pthread_detach() to create a new thread. One thread is spawn for each new request. 
+    We detach these threads so that they would not block the main thread and the resources occupied by threads would be
+    released automatically after execution. 
+
+2. HTTP protocol danger:
+
+    1) 404 Not Found: This happens when URL is outdated or does not exist. If the rule 
+    to produce URL changes, web files are renamed or the URL users input is wrong, the
+    server would response 404 to indicate the requested resources does not exist.
+
+    2) 400 Bad Request: If the format or syntax of the request is wrong, the server would
+    not be able to understand it.Or sometimes the domain name of web page would be wrong. 
+    The server handles these situation by sending 400 back to client.
+
+    3) 502 Bad Gateway: If the server receives an invalid response as a gateway or proxy 
+    server, 502 would be returned to client.
+
+3. Socket danger:
+
+    1) When proxy opens an socket to accept browse or connects to the server, any step 
+    can go wrong. We check the return value of functions, if there is an error, print 
+    the reason and exit the program.
+
+4. Malloc danger:
+    1) The dynamic allocation may fail. We use try/catch exception to deal with this kind of failure.
+
+
+
+    

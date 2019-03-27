@@ -1,0 +1,55 @@
+This file is written to show you how to test our proxy.
+
+First you have to change your network setting, using manual proxy configuration.
+The proxy name is the VM you are using, the port is 12345.
+
+Then To run the program, type "sudo docker-compose up" in your VM's terminal. 
+The browser we used for testing is Chrome. Maybe the browser cache is needed to be 
+Cleared before testing.
+
+
+Test results can be reviewed in proxy.log.
+
+1. testing for normal cases
+Test GET:
+http://scratchpads.eu/
+http://www.rabihyounes.com/
+http://home.sina.com/
+
+Test CONNECT:
+https://www.baidu.com/
+https://google.com/
+
+Test POST:
+http://www.artsci.utoronto.ca/futurestudents/search_form?SearchableText=
+You can type something in this advanced search form to search. Results will be returned normally. 
+
+Larger ones:
+http://www.sohu.com/ (it will take a while when you first open it!)
+https://www.youtube.com/
+
+2. Test the cache
+
+Run command:
+$ echo -ne "GET  /awesome.txt HTTP/1.1\r\nHost: rabihyounes.com\r\n\Cache-Control:max-age=10\r\n\r\n" | nc localhost 12345
+You can see the picture we GET from this website and you can see "not in cache" and expire time in the proxy_log.
+If run the command again, you can see "in cache, valid" in the proxy_log.
+
+
+Refresh the http://www.rabihyounes.com/, you will find it take shorter time to load
+This website. If you check the proxy.log, you will find the cache record.
+
+ 
+3. Test expire and re-validation
+
+Go to http://www.artsci.utoronto.ca/futurestudents/ and refresh the page many times
+Since the pictures on this page will change, so this page needs revalidation (max-age=0)
+for every response. You can see the record of revalidation in proxy.log
+
+
+
+
+
+
+
+
